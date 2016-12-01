@@ -2,22 +2,27 @@
 var express = require('express');
 var load = require('express-load');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
-module.exports = function(){
+module.exports = function () {
     var app = express();
-    
+
     app.set('port', 3000);
 
-    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
+    app.use(cors());
 
-    load('models', {cwd: 'app'})
+    load('models', { cwd: 'app' })
         .then('controllers')
         .then('routes')
         .into(app);
 
-    // se nenhum rota atender, direciona para página 404
-    app.get('*', function(req, res) {
+    app.get('*', function (req, res) {
+        res.status(404).end();
+    });
+
+    app.post('*', function (req, res) {
         res.status(404).end();
     });
 

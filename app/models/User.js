@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 
-module.exports = function() {
+module.exports = function () {
     var schema = mongoose.Schema({
         email: {
-             type: String,
-             required: true
+            type: String,
+            required: true
         },
         name: {
             type: String,
@@ -17,6 +17,15 @@ module.exports = function() {
         createdAt: {
             type: Date,
             default: Date.now
+        },
+        forgotPassword: {
+            token: {
+                type: String,
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
         }
     });
 
