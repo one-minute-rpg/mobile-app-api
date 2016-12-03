@@ -7,6 +7,9 @@ module.exports = function (app) {
     app.route('/quest/find')
         .get(controller.find);
 
-    app.route('/quest/download')
+    app.route('/quest/download/:id')
         .get(controller.download);
+
+    app.route('/quest/publish')
+        .post(controller.publish);
 };

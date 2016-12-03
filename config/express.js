@@ -10,7 +10,7 @@ module.exports = function () {
     app.set('port', 3000);
 
     app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({limit: '10mb'}));
     app.use(cors());
 
     load('models', { cwd: 'app' })
