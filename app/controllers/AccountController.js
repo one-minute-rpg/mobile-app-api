@@ -4,31 +4,43 @@ var chance = require('chance')();
 module.exports = function (app) {
     var controller = {};
 
-    controller.login = function (req, res) {
+    var FacebookAuthToken = app.models.FacebookAuthToken;
+
+    controller.loginFacebook = function(req, res) {
         var loginData = {
             email: sanitize(req.body.email),
-            password: sanitize(req.body.password)
+            userId: sanitize(req.body.userId),
+            accessToken: sanitize(req.body.accessToken)
         };
 
-        res.status(200).json({
-            token: chance.guid()
-        });
-    };
-
-    controller.recoverPassword = function (req, res) {
-        var email = sanitize(req.body.email);
-        res.status(200).end();
-    };
-
-    controller.create = function (req, res) {
-        var accountData = {
-            email: sanitize(req.body.email),
-            name: sanitize(req.body.name),
-            password: sanitize(req.body.password)
+        var filter = {
+            userId: loginData.userId
         };
 
-        res.status(200).end();
-    }
+        FacebookAuthToken.findOne(filter)
+            .then(function(user) {
+                if(!!user) {
+                    return FacebookAuthToken.update(
+                        filter,
+                        {
+                            $set: {
+                                email: loginData.email,
+                                accessToken: loginData.accessToken
+                            }
+                        }
+                    );
+                }
+                else {
+                    return FacebookAuthToken.create(loginData);
+                }
+            })
+            .then(function() {
+                res.status(200).end();
+            })
+            .catch(function(err) {
+                res.status(500).end();
+            });
+    };
 
     return controller;
 }
