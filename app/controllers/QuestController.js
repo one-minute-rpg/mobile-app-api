@@ -80,11 +80,11 @@ module.exports = function (app) {
             })
             .then(function(dbQuestResume) {
                 var resumeModel = {
-                    quest_id: result.quest_id,
-                    title: result.title,
-                    language: result.language,
-                    cover: result.cover,
-                    description: result.description
+                    quest_id: dbQuestResume.quest_id,
+                    title: dbQuestResume.title,
+                    language: dbQuestResume.language,
+                    cover: dbQuestResume.cover,
+                    description: dbQuestResume.description
                 };
 
                 if(!!dbQuestResume) {
