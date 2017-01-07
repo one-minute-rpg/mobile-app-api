@@ -14,6 +14,8 @@ module.exports = function () {
     app.use(cors());
 
     load('models', { cwd: 'app' })
+        .then('services')
+        .then('middlewares')
         .then('controllers')
         .then('routes')
         .into(app);

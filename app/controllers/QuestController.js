@@ -60,15 +60,41 @@ module.exports = function (app) {
     controller.publish = function(req, res) {
         var quest = req.body;
 
-        QuestFull.create(quest)
-            .then(function(result) {
-                return QuestResume.create({
+        var query = {
+            quest_id: quest.quest_id
+        };
+
+        QuestFull.findOne(query)
+            .then(function(dbQuest) {
+                if(!!dbQuest) {
+                    return QuestFull.update(query, {
+                        $set: quest
+                    });
+                }
+                else {
+                    return QuestFull.create(quest);
+                }
+            })
+            .then(function(){
+                return QuestResume.findOne(query);
+            })
+            .then(function(dbQuestResume) {
+                var resumeModel = {
                     quest_id: result.quest_id,
                     title: result.title,
                     language: result.language,
                     cover: result.cover,
                     description: result.description
-                });
+                };
+
+                if(!!dbQuestResume) {
+                    return QuestResume.update(query, {
+                        $set: resumeModel
+                    });
+                }
+                else {
+                    return QuestResume.create(resumeModel);
+                }
             })
             .then(function(result) {
                 res.status(200).end();

@@ -10,13 +10,15 @@ module.exports = function (app) {
 
     var User = app.models.User;
     var AuthToken = app.models.AuthToken;
+    var SecurityService = app.services.SecurityService;
 
     controller.login = function(req, res) {
-        //TODO: crypt
         var loginData = {
             email: sanitize(req.body.email),
             password: sanitize(req.body.password)
         };
+
+        loginData.password = SecurityService.toMD5(loginData.password);
 
         var token = chance.guid();
 
@@ -31,13 +33,16 @@ module.exports = function (app) {
                 });
             })
             .then(function(authToken) {
-                return !!authToken ?
-                    AuthToken.create({
+                var promise = null;
+
+                if(!authToken) {
+                    promise = AuthToken.create({
                         email: loginData.email,
                         token: token
-                    })
-                    :
-                    AuthToken.update(
+                    });
+                }
+                else {
+                    promise =  AuthToken.update(
                         { email: loginData.email },
                         {
                             $set: {
@@ -46,15 +51,23 @@ module.exports = function (app) {
                             }
                         }
                     );
+                }
+
+                return promise;
             })
             .then(function() {
+                return User.findOne({email: loginData.email});
+            })
+            .then(function(user) {
                 res.status(200).json({
-                    token: token
+                    token: token,
+                    email: user.email,
+                    name: user.name
                 });
             })
             .catch(function(err) {
                 if(err === ERR_LOGIN_INVALID) {
-                    res.status(400).json({
+                    res.status(401).json({
                         code: ERR_LOGIN_INVALID
                     });
                 }
@@ -67,12 +80,13 @@ module.exports = function (app) {
     };
 
     controller.createAccount = function(req, res) {
-        // TODO: crypt pass.
         var accountData = {
             email: sanitize(req.body.email),
             password: sanitize(req.body.password),
             name: sanitize(req.body.name)
         };
+
+        accountData.password = SecurityService.toMD5(accountData.password);
         
         User.findOne({email: accountData.email})
             .then(function(user) {
@@ -96,41 +110,6 @@ module.exports = function (app) {
                         code: ERR_INTERNAL
                     });
                 }
-            });
-    };
-
-    controller.loginFacebook = function(req, res) {
-        var loginData = {
-            userId: sanitize(req.body.userId),
-            accessToken: sanitize(req.body.accessToken)
-        };
-
-        var filter = {
-            userId: loginData.userId
-        };
-
-        FacebookAuthToken.findOne(filter)
-            .then(function(user) {
-                if(!!user) {
-                    return FacebookAuthToken.update(
-                        filter,
-                        {
-                            $set: {
-                                email: loginData.email,
-                                accessToken: loginData.accessToken
-                            }
-                        }
-                    );
-                }
-                else {
-                    return FacebookAuthToken.create(loginData);
-                }
-            })
-            .then(function() {
-                res.status(200).end();
-            })
-            .catch(function(err) {
-                res.status(500).end();
             });
     };
 

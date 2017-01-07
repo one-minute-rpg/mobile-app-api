@@ -1,5 +1,6 @@
 module.exports = function (app) {
     var controller = app.controllers.AccountQuestController;
+    var ReqLoggedUserMiddleware = app.middlewares.ReqLoggedUserMiddleware;
 
     app.route('/account-quest/comment')
         .post(controller.comment)
@@ -12,4 +13,7 @@ module.exports = function (app) {
     app.route('/account-quest/my-quests')
         .post(controller.saveQuestToAccount)
         .delete(controller.removeQuestFromAccount);
+
+    app.route('/account-quest/like')
+        .post(ReqLoggedUserMiddleware, controller.like);
 };

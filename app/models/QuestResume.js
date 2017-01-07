@@ -19,6 +19,10 @@ module.exports = function () {
         },
         quest_id: { 
             type: String,
+        },
+        likes: {
+            type: Number,
+            default: 0
         }
     });
 
