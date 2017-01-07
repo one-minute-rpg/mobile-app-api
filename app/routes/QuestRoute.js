@@ -13,4 +13,7 @@ module.exports = function (app) {
 
     app.route('/quest/publish')
         .post(reqAppAuthMiddleware, controller.publish);
+
+    app.route('/quest/resume/:id')
+        .get(controller.getResume);
 };

@@ -48,6 +48,28 @@ module.exports = function (app) {
         res.status(200).json([]);
     };
 
+    controller.getAllLiked = function(req, res) {
+        var authData = req.authData;
+        var email = authData.email;
+        var query = {user_email: email};
+
+        QuestUser.find(query)
+            .then(function(quests) {
+                var respData = quests.map(function(q) {
+                    return {
+                        quest_id: q.quest_id
+                    }
+                });
+
+                res.status(200).json(respData);
+            })
+            .catch(function(err) {
+                res.status(500).json({
+                    code: 'ERR_INTERNAL'
+                });
+            })
+    };
+
     controller.like = function(req, res) {
         var authData = req.authData;
         var questId = sanitize(req.body.questId);

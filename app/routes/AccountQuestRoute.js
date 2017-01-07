@@ -15,5 +15,7 @@ module.exports = function (app) {
         .delete(controller.removeQuestFromAccount);
 
     app.route('/account-quest/like')
+        .get(ReqLoggedUserMiddleware, controller.getAllLiked)
         .post(ReqLoggedUserMiddleware, controller.like);
+
 };

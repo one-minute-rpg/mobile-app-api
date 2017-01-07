@@ -17,6 +17,10 @@ module.exports = function() {
         cover: {
             type: String
         },
+        version: {
+            type: Number,
+            default: 0
+        },
         hero: {
             attributes: {
                 health: {

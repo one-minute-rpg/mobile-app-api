@@ -23,6 +23,10 @@ module.exports = function () {
         likes: {
             type: Number,
             default: 0
+        },
+        version: {
+            type: Number,
+            default: 0
         }
     });
 

@@ -67,11 +67,13 @@ module.exports = function (app) {
         QuestFull.findOne(query)
             .then(function(dbQuest) {
                 if(!!dbQuest) {
+                    quest.version = dbQuest.version + 1;
                     return QuestFull.update(query, {
                         $set: quest
                     });
                 }
                 else {
+                    quest.version = 1;
                     return QuestFull.create(quest);
                 }
             })
@@ -80,14 +82,17 @@ module.exports = function (app) {
             })
             .then(function(dbQuestResume) {
                 var resumeModel = {
-                    quest_id: dbQuestResume.quest_id,
-                    title: dbQuestResume.title,
-                    language: dbQuestResume.language,
-                    cover: dbQuestResume.cover,
-                    description: dbQuestResume.description
+                    quest_id: quest.quest_id,
+                    title: quest.title,
+                    language: quest.language,
+                    cover: quest.cover,
+                    description: quest.description,
+                    version: 1
                 };
 
                 if(!!dbQuestResume) {
+                    resumeModel.version = dbQuestResume.version + 1;
+
                     return QuestResume.update(query, {
                         $set: resumeModel
                     });
@@ -103,6 +108,19 @@ module.exports = function (app) {
                 res.status(500).end();
             });
     };
+
+    controller.getResume = function(req, res) {
+        var id = sanitize(req.params.id);
+        var query = { quest_id: id };
+
+        QuestResume.findOne(query)
+            .then(function(questResume) {
+                res.status(200).json(questResume);
+            })
+            .catch(function(err){
+                res.status(500).end();
+            });
+    }
     
     return controller;
 }
