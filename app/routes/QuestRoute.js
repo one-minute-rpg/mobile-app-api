@@ -1,5 +1,6 @@
 module.exports = function (app) {
     var controller = app.controllers.QuestController;
+    var reqAppAuthMiddleware = app.middlewares.ReqAppAuthMiddleware;
 
     app.route('/quest/search')
         .get(controller.search);
@@ -11,5 +12,5 @@ module.exports = function (app) {
         .get(controller.download);
 
     app.route('/quest/publish')
-        .post(controller.publish);
+        .post(reqAppAuthMiddleware, controller.publish);
 };
